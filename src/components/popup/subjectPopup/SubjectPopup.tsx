@@ -13,6 +13,7 @@ import GlobalStyle from '../../GlobalStyle';
 import Blackout from '../../ui/blackout/Blackout';
 import Button from '../../ui/button/Button';
 import Input from './components/Input';
+import {getDBConnection, insertSubject} from '../../../lib/sqlite/db-service';
 
 export interface BlackoutPropsType {
 	statusView: boolean;
@@ -51,7 +52,7 @@ const SubjectPopup: FC<BlackoutPropsType> = ({statusView, setStatusView}) => {
 		setStatusView(false);
 	};
 
-	const createSublect = () => {
+	const createSublect = async () => {
 		setErorrs({title: false, description: false});
 		if (subjectTitle.length < 1) {
 			setErorrs({...erorrs, title: true});
@@ -61,18 +62,29 @@ const SubjectPopup: FC<BlackoutPropsType> = ({statusView, setStatusView}) => {
 			setErorrs({...erorrs, description: true});
 			return;
 		}
-		updateSubjects([
-			...subjects,
-			{
-				id: subjects.length ? subjects[subjects.length - 1].id + 1 : 0,
-				title: subjectTitle,
-				description: subjectDescription,
-				status: false,
-			},
-		]);
+		const id =
+			subjects && subjects.length
+				? subjects.reduce((acc, cur) => {
+						if (cur.id > acc.id) return cur;
+						return acc;
+				  }).id + 1
+				: 0;
+		const new_subject = {
+			id,
+			title: subjectTitle,
+			description: subjectDescription,
+			status: false,
+		};
+		updateSubjects([...subjects, new_subject]);
 		setSubjectTitle('');
 		setSubjectDescription('');
 		cancelFonm();
+		try {
+			const connect = await getDBConnection();
+			insertSubject(connect, new_subject);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	useEffect(() => {

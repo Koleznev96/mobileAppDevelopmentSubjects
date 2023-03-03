@@ -22,9 +22,10 @@ import CardMap from '../../components/cardMap/cardMap';
 import {RootStackParamList} from '../../Routes';
 
 import {styles} from './useStyles';
+import {createTable, deleteSubject, getDBConnection, getSubjects, updateSubject} from '../../lib/sqlite/db-service';
 
 type Props = {
-	updateSubjects: ActionCreatorWithPayload<Subject, string>;
+	updateSubjects: ActionCreatorWithPayload<Subjects, string>;
 	deleteItem: ActionCreatorWithPayload<Subject, string>;
 };
 
@@ -39,6 +40,32 @@ const HomeScreen = () => {
 	const [filterData, setFilterData] = useState(subjects);
 	const [statusFilter, setStatusFilter] = useState('Показывать все задания');
 	const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+
+	const loadDataCallback = useCallback(async () => {
+		try {
+			const connect = await getDBConnection();
+			await createTable(connect);
+			const storedSubjects = await getSubjects(connect);
+			console.log('storedSubjects-', storedSubjects);
+			updateSubjects(storedSubjects);
+		} catch (error) {
+			console.error(error);
+		}
+	}, [getDBConnection, createTable]);
+
+	useEffect(() => {
+		loadDataCallback();
+	}, []);
+
+	const deleteDataSubject = async (subject: Subject) => {
+		deleteItem(subject);
+		try {
+			const connect = await getDBConnection();
+			deleteSubject(connect, subject.id);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	const viewFilter = () => setStatusViewFilter(!statusViewFilter);
 
@@ -59,7 +86,7 @@ const HomeScreen = () => {
 		setFilterData(newDataFilter ? newDataFilter : filterData);
 	}, [subjects]);
 
-	const updateStatusCard = (item: Subject) => {
+	const updateStatusCard = async (item: Subject) => {
 		updateSubjects(
 			subjects.map((subject: Subject) => {
 				if (subject.id !== item.id) {
@@ -69,6 +96,12 @@ const HomeScreen = () => {
 				}
 			}),
 		);
+		try {
+			const connect = await getDBConnection();
+			updateSubject(connect, {...item, status: !item.status});
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const updateWeather = useCallback(() => {
@@ -105,7 +138,7 @@ const HomeScreen = () => {
 			>
 				{subjects.length > 0 ? (
 					filterData.map((item: Subject) => (
-						<CardSubject key={item.id} data={item} updateSubjects={updateStatusCard} deleteCard={deleteItem} />
+						<CardSubject key={item.id} data={item} updateSubjects={updateStatusCard} deleteCard={deleteDataSubject} />
 					))
 				) : (
 					<Text style={[GlobalStyle.CustomFontRegular, styles.emptyList]}>Список пуст</Text>

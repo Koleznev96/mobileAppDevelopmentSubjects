@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const init = getSubjects('subjects');
 const subjects = init !== null ? init : initialSubject;
-const initialState: SubjectInit = {subjects};
+const initialState: SubjectInit = {subjects: []};
 
 export const subjectsSlice = createSlice({
 	name: 'subjects',
