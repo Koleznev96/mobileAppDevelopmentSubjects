@@ -8,7 +8,7 @@
 
 ## About The Project
 
-Приложение разработано на React-Native, TypeScript.
+Приложение разработано на React-Native, TypeScript, SQLite.
 
 Данное приложение предстовляет собой список заданий, с возможностью:
 
@@ -19,9 +19,17 @@
 
 Так же в приложении предусмотренно отображение погоды в городе Красноярск, и отображение карты.
 
+### V2.0
+
+- Добавлено подключение к БД SQLite, и соответствующий функционал для работы приложения.
+
+### DateBase (SQLite)
+
+Запросы и функционал для работы с SQLite находятся в файле: ./src/lib/sqlite/db-service.ts
+
 ### Application build (APK)
 
-Скачайте на Android устройство [APK файл](https://disk.yandex.ru/d/NbFs5vM6R6SsYg) и установите его.
+Скачайте на Android устройство [APK файл](https://disk.yandex.ru/d/OEPW-yJRg102GA) и установите его.
 
 ### Run project in development
 
