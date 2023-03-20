@@ -17,6 +17,9 @@ import {PersistGate} from 'reduxjs-toolkit-persist/integration/react';
 import {Routes} from './Routes';
 import {store} from './lib/redux/store';
 import {persistStore} from 'reduxjs-toolkit-persist';
+import YaMap from 'react-native-yamap';
+
+YaMap.init('3127729d-06a5-4bdb-bb67-7ad93a3c7f47');
 
 const persistor = persistStore(store);
 
