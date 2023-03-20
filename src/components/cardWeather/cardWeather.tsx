@@ -13,7 +13,7 @@ import GlobalStyle from '../GlobalStyle';
 type CardPropsType = {
 	updateDataHandler: () => void;
 	isLoading: Boolean;
-	value?: String;
+	value?: number;
 	city: String;
 };
 
@@ -29,7 +29,7 @@ const CardWeather = ({updateDataHandler, isLoading, value, city}: CardPropsType)
 			) : (
 				<View style={styles.card}>
 					<WeatherSvg />
-					<Text style={[GlobalStyle.CustomFontBold, styles.carValue]}>{value || '-'}°</Text>
+					<Text style={[GlobalStyle.CustomFontBold, styles.carValue]}>{value ? Math.round(value) - 271 : '+6'}°</Text>
 					<Text style={[GlobalStyle.CustomFontLite, styles.cardCity]}>{city}</Text>
 				</View>
 			)}

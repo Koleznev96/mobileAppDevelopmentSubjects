@@ -21,7 +21,7 @@
 
 ### V3.0
 
-- Подключена Open Api Weather (api.weatherunlocked.com/api), для отображения текущей погоды.
+- Подключена Open Api Weather (api.openweathermap.org/data/2.5/weathe), для отображения текущей погоды.
 - Подключена Yandex map, и созданы метки с описанием.
 - В текущем документе добавлен план монетизации и публикации приложения.
 - Добавлено руководство пользователя приложения.
@@ -57,7 +57,7 @@
 
 ### Application build (APK)
 
-Скачайте на Android устройство [APK файл](https://disk.yandex.ru/d/QKK5BztoGE_QQw) и установите его.
+Скачайте на Android устройство [APK файл](https://disk.yandex.ru/d/gVmU5Vr6G_eXhA) и установите его.
 
 ### Run project in development
 

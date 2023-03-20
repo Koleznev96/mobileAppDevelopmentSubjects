@@ -32,7 +32,7 @@ type Props = {
 type homeScreenProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 type TWeather = {
-	temp_c?: string;
+	temp?: number;
 };
 
 const HomeScreen = () => {
@@ -112,12 +112,16 @@ const HomeScreen = () => {
 	const updateWeather = useCallback(async () => {
 		if (isLoadingWeather) return;
 		setIsLoadingWeather(true);
-		const url =
-			'http://api.weatherunlocked.com/api/current/56.0184,92.8672?app_id=a12e5a25&app_key=0ab8b58809fc3250eeb2d9d6e3b9e6ac';
-		const response: Response = await fetch(url, {method: 'GET'});
-		const data: TWeather = await response.json();
-		setDataWeather(data);
-		setTimeout(() => setIsLoadingWeather(false), 500);
+		try {
+			const url =
+				'https://api.openweathermap.org/data/2.5/weather?q=Krasnoyarsk,ru&APPID=49472aaf0c83ee602fec106ed6094136';
+			const response: Response = await fetch(url, {method: 'GET'});
+			const data: {main: {temp: number}} = await response.json();
+			setDataWeather(data?.main);
+		} catch (e) {
+			console.log('Error-', e);
+		}
+		setIsLoadingWeather(false);
 	}, [setIsLoadingWeather, isLoadingWeather, setDataWeather, fetch]);
 
 	const mapHandler = () => navigation.navigate('Map');
@@ -130,7 +134,7 @@ const HomeScreen = () => {
 				<CardWeather
 					updateDataHandler={updateWeather}
 					isLoading={isLoadingWeather}
-					value={dataWeather?.temp_c}
+					value={dataWeather?.temp}
 					city={'Красноярск'}
 				/>
 				<CardMap mapHandler={mapHandler} />
