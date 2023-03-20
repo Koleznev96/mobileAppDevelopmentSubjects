@@ -31,22 +31,26 @@ type Props = {
 
 type homeScreenProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
+type TWeather = {
+	temp_c?: string;
+};
+
 const HomeScreen = () => {
 	const navigation = useNavigation<homeScreenProp>();
 	const {updateSubjects, deleteItem}: Props = useActions();
 	const {subjects}: SubjectInit = useAppSelector(state => state.subjects);
 	const [statusViewFilter, setStatusViewFilter] = useState(false);
 	const [statusCreateView, setStatusCreateView] = useState(false);
-	const [filterData, setFilterData] = useState(subjects);
+	const [filterData, setFilterData] = useState<Subject[] | null>(subjects);
 	const [statusFilter, setStatusFilter] = useState('Показывать все задания');
 	const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+	const [dataWeather, setDataWeather] = useState<TWeather | null>(null);
 
 	const loadDataCallback = useCallback(async () => {
 		try {
 			const connect = await getDBConnection();
 			await createTable(connect);
 			const storedSubjects = await getSubjects(connect);
-			console.log('storedSubjects-', storedSubjects);
 			updateSubjects(storedSubjects);
 		} catch (error) {
 			console.error(error);
@@ -55,6 +59,7 @@ const HomeScreen = () => {
 
 	useEffect(() => {
 		loadDataCallback();
+		updateWeather();
 	}, []);
 
 	const deleteDataSubject = async (subject: Subject) => {
@@ -104,13 +109,16 @@ const HomeScreen = () => {
 		}
 	};
 
-	const updateWeather = useCallback(() => {
-		// TODO: подключить API погоды
-
+	const updateWeather = useCallback(async () => {
 		if (isLoadingWeather) return;
 		setIsLoadingWeather(true);
-		setTimeout(() => setIsLoadingWeather(false), 1500);
-	}, [setIsLoadingWeather, isLoadingWeather]);
+		const url =
+			'http://api.weatherunlocked.com/api/current/56.0184,92.8672?app_id=a12e5a25&app_key=0ab8b58809fc3250eeb2d9d6e3b9e6ac';
+		const response: Response = await fetch(url, {method: 'GET'});
+		const data: TWeather = await response.json();
+		setDataWeather(data);
+		setTimeout(() => setIsLoadingWeather(false), 500);
+	}, [setIsLoadingWeather, isLoadingWeather, setDataWeather, fetch]);
 
 	const mapHandler = () => navigation.navigate('Map');
 
@@ -119,7 +127,12 @@ const HomeScreen = () => {
 			<FilterPopup onPress={filterHandler} statusView={statusViewFilter} />
 			<SubjectPopup statusView={statusCreateView} setStatusView={setStatusCreateView} />
 			<View style={styles.containerHeader}>
-				<CardWeather updateDataHandler={updateWeather} isLoading={isLoadingWeather} value={'-5'} city={'Красноярск'} />
+				<CardWeather
+					updateDataHandler={updateWeather}
+					isLoading={isLoadingWeather}
+					value={dataWeather?.temp_c}
+					city={'Красноярск'}
+				/>
 				<CardMap mapHandler={mapHandler} />
 			</View>
 			<View style={styles.containerHeader}>
@@ -137,7 +150,7 @@ const HomeScreen = () => {
 				keyboardShouldPersistTaps="handled"
 			>
 				{subjects.length > 0 ? (
-					filterData.map((item: Subject) => (
+					filterData?.map((item: Subject) => (
 						<CardSubject key={item.id} data={item} updateSubjects={updateStatusCard} deleteCard={deleteDataSubject} />
 					))
 				) : (
